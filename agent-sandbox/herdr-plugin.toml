@@ -1,0 +1,41 @@
+id = "swibrow.agent-sandbox"
+name = "Agent sandbox"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Run Claude Code in an agent-sandbox pod on a fresh clone of the current repo"
+platforms = ["macos", "linux"]
+
+[[build]]
+command = ["go", "build", "-o", "bin/herdr-sandbox", "."]
+
+[[actions]]
+id = "launch"
+title = "Claude in sandbox"
+description = "Claim a sandbox, clone the focused repo and open Claude Code in a new tab"
+contexts = ["global", "workspace", "pane"]
+command = ["./bin/herdr-sandbox", "launch"]
+
+[[actions]]
+id = "list"
+title = "Sandboxes"
+description = "Reattach to or delete running sandboxes"
+contexts = ["global", "workspace", "pane"]
+command = ["./bin/herdr-sandbox", "picker"]
+
+[[panes]]
+id = "session"
+title = "claude (sandbox)"
+placement = "tab"
+command = ["./bin/herdr-sandbox", "attach"]
+
+[[panes]]
+id = "picker"
+title = "Sandboxes"
+placement = "popup"
+width = "80%"
+height = "50%"
+command = ["./bin/herdr-sandbox", "list"]
+
+[[events]]
+on = "pane.closed"
+command = ["./bin/herdr-sandbox", "reap"]
