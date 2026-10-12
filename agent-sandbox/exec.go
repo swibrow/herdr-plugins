@@ -19,6 +19,10 @@ import (
 //go:embed session.sh
 var sessionScript string
 
+// detachedExitCode is what session.sh exits with when tmux was detached rather
+// than claude exiting.
+const detachedExitCode = 3
+
 func (k *kube) execSession(ctx context.Context, pod string, src source) (int, error) {
 	req := k.core.CoreV1().RESTClient().Post().
 		Resource("pods").Namespace(k.cfg.Namespace).Name(pod).SubResource("exec").

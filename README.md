@@ -12,7 +12,7 @@ The `launch` action reads the focused pane's directory, resolves its GitHub `ori
 
 1. Creates a `SandboxClaim` against the `claude` warm pool, with a 12h `shutdownTime` backstop.
 2. Waits for the claimed pod to be ready.
-3. Execs [`session.sh`](agent-sandbox/session.sh) in the pod. It clones the repo into `/workspace/<repo>`, checks out the branch and runs `claude`.
+3. Execs [`session.sh`](agent-sandbox/session.sh) in the pod. It clones the repo into `/workspace/<repo>`, checks out the branch and runs `claude`, under tmux when the image has it.
 
 What ends the session:
 
@@ -20,7 +20,8 @@ What ends the session:
 |---|---|
 | `claude` exits | The claim is deleted |
 | The tab is closed | The `pane.closed` hook deletes the claim |
-| The connection drops | The tab offers to reconnect, which resumes with `claude --continue` |
+| tmux is detached (prefix `d`) | The sandbox is kept |
+| The connection drops | The tab offers to reconnect. With tmux in the image this reattaches to the running claude; without it, claude resumes with `--continue` |
 
 The `list` action opens a picker of running sandboxes: `enter` reattaches in a new tab and `ctrl-x` deletes.
 
