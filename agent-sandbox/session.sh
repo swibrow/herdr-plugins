@@ -20,6 +20,20 @@ if [[ ! -d $dir/.git ]]; then
 fi
 
 cd "$dir"
+
+# Under tmux a dropped connection leaves claude running and `new-session -A`
+# reattaches. Exit 3 tells the plugin tmux was detached, not ended.
+if command -v tmux >/dev/null; then
+  export TERM=${TERM:-xterm-256color}
+  # shellcheck disable=SC2086
+  tmux new-session -A -s claude claude ${CLAUDE_ARGS:-} \; set -g status off \; set -g mouse on \; set -s escape-time 0 || true
+  if tmux has-session -t claude 2>/dev/null; then
+    exit 3
+  fi
+  exit 0
+fi
+
+# Without tmux, a reconnect resumes the conversation instead.
 if [[ -f .git/herdr-session ]]; then
   # shellcheck disable=SC2086
   exec claude --continue ${CLAUDE_ARGS:-}

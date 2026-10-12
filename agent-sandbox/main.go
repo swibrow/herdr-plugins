@@ -214,6 +214,11 @@ func attach(ctx context.Context, cfg config) error {
 		case err == nil && code == 0:
 			untrackPane(pane)
 			return k.deleteClaim(context.Background(), name)
+		case err == nil && code == detachedExitCode:
+			untrackPane(pane)
+			fmt.Printf("detached; sandbox %s kept until its TTL. Reattach from the sandbox list.\n", name)
+			pause("press enter to close")
+			return nil
 		case ctx.Err() != nil:
 			return nil
 		}
